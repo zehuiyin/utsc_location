@@ -145,7 +145,8 @@
         .setLngLat(coordinates)
         .setHTML(description)
         .addTo(map);
-
+  })
+  .then(function() {
       // render point above polygon
       map.moveLayer('utsc_buildings_extrusion', 'utsc');
   });
