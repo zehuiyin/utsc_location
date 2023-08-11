@@ -59,7 +59,11 @@
       bearing: 0
     });
 
-    fetch("data/utsc.geojson")
+    // Add GeoJSON layer
+    map.on('load', function() {
+      map.addControl(new maplibregl.NavigationControl());
+
+      fetch("data/utsc.geojson")
 	  .then(function(response) {
       return response.json()
 	  }).then(function(utsc_buildings){
@@ -85,12 +89,9 @@
                 // Make extrusions slightly opaque to see through indoor walls.
                'fill-extrusion-opacity': 0.8
         }
+     });
     });
-    });
-
-    // Add GeoJSON layer
-    map.on('load', function() {
-      map.addControl(new maplibregl.NavigationControl());
+	    
       map.addSource('utsc_data', {
         'type': 'geojson',
         'data': {
