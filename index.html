@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Toronto Bikeshare Station Info</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <script src="js/maplibre-gl.js"></script>
+  <link rel="stylesheet" href="css/maplibre-gl.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <style>
+    #map {position: absolute; top: 0; right: 0; bottom: 0; left: 0;}
+    .popup {text-align: center;}
+    .title {
+      display: table;
+      position: relative;
+      margin: 0px auto;
+      word-wrap: anywhere;
+      white-space: pre-wrap;
+      padding: 10px;
+      border: none;
+      border-radius: 3px;
+      font-size: 24px;
+      text-align: center;
+      color: #222;
+      background: #fff;
+    }
+    .legend {
+      background-color: #fff;
+      border-radius: 3px;
+      bottom: 30px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      font: 16px/24px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+      padding: 10px;
+      position: absolute;
+      right: 10px;
+      z-index: 1;
+    }
+    .legend div span {
+        border-radius: 50%;
+        display: inline-block;
+        height: 10px;
+        margin-right: 5px;
+        width: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map">
+    <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
+  </div>
+
+  <script>
+    // Initialize map
+    let map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://api.maptiler.com/maps/dataviz/style.json?key=6hf6e15uU2uBMqnFFRXs',
+      center: [-79.1859362959516, 43.78467115257381],
+      zoom: 16,
+      pitch: 35,
+      bearing: 0
+    });
+
+    fetch("/utsc.geojson")
+	  .then(function(response) {
+      return response.json()
+	  }).then(function(utsc_buildings){
+      map.addSource('utsc_buildings_data', {
+        'type': 'geojson',
+        'data': utsc_buildings
+      });
+
+      map.addLayer({
+        'id': 'utsc_buildings_extrusion',
+        'source': 'utsc_buildings_data',
+        'type': 'fill-extrusion',
+        'paint': {
+                // Get the `fill-extrusion-color` from the source `color` property.
+                'fill-extrusion-color': '#d9d9d9',
+ 
+                // Get `fill-extrusion-height` from the source `height` property.
+                'fill-extrusion-height': ['get', 'AVG_HEIGHT'],
+ 
+                // Get `fill-extrusion-base` from the source `base_height` property.
+                'fill-extrusion-base': ['get', 'MIN_HEIGHT'],
+ 
+                // Make extrusions slightly opaque to see through indoor walls.
+               'fill-extrusion-opacity': 0.8
+        }
+    });
+    });
+
+    // Add GeoJSON layer
+    map.on('load', function() {
+      map.addControl(new maplibregl.NavigationControl());
+      map.addSource('utsc_data', {
+        'type': 'geojson',
+        'data': {
+          "name":"utsc",
+          "type":"FeatureCollection",
+          "features":[
+          {"type": "Feature",
+          "geometry":{
+            "type": "Point", 
+            "coordinates": [-79.1859362959516, 43.78467115257381]},
+          "properties":{
+
+           }
+        }
+        ]}
+      });
+
+      map.addLayer({
+        'id': 'utsc',
+        'source': 'utsc_data',
+        'type': 'circle',
+        'paint': {
+            'circle-radius': {
+                'base': 1.75, // control interpolate changing rate, more toward higher end
+                'stops': [
+		              [2, 2],
+                  [16, 7], // zoom level 12, circle radius 7
+                  [22, 240]
+                ]
+             },
+            'circle-color': '#1f78b4'
+        }
+    });
+
+    let coordinates = [-79.1859362959516, 43.78467115257381];
+    let description = 
+      '<div class="popup">' + 
+      'University of Toronto Scarborough' +
+      '</div>';
+
+      // Display popups on click
+      map.on('click', 'utsc', function(e) {
+        new maplibregl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(description)
+          .addTo(map);
+      });
+
+      // Display popups on load
+      const popup = new maplibregl.Popup({ closeOnClick: true , focusAfterOpen: false})
+        .setLngLat(coordinates)
+        .setHTML(description)
+        .addTo(map);
+  });
+  
+  </script>
+</body>
+</html>
