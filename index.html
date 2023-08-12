@@ -134,7 +134,7 @@
 
       // Display popups on click
       map.on('click', 'utsc', function(e) {
-        new maplibregl.Popup()
+        new maplibregl.Popup({ closeOnClick: true , focusAfterOpen: false})
           .setLngLat(coordinates)
           .setHTML(description)
           .addTo(map);
