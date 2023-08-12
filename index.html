@@ -9,43 +9,20 @@
   <style>
     #map {position: absolute; top: 0; right: 0; bottom: 0; left: 0;}
     .popup {text-align: center;}
-    .title {
-      display: table;
-      position: relative;
-      margin: 0px auto;
-      word-wrap: anywhere;
-      white-space: pre-wrap;
-      padding: 10px;
-      border: none;
-      border-radius: 3px;
-      font-size: 24px;
-      text-align: center;
-      color: #222;
-      background: #fff;
-    }
-    .legend {
-      background-color: #fff;
-      border-radius: 3px;
-      bottom: 30px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      font: 16px/24px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-      padding: 10px;
-      position: absolute;
-      right: 10px;
-      z-index: 1;
-    }
-    .legend div span {
-        border-radius: 50%;
-        display: inline-block;
-        height: 10px;
-        margin-right: 5px;
-        width: 10px;
-    }
+    .attribution-container {
+     bottom: 0;
+     right: 0;
+     position: absolute;
+     display: block;
+     margin: 0 10px 5px;
+   }
   </style>
 </head>
 <body>
   <div id="map">
-    <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
+	  <div class="attribution-container">
+           <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
+          </div>
   </div>
 
   <script>
@@ -62,6 +39,15 @@
     // Add GeoJSON layer
     map.on('load', function() {
       map.addControl(new maplibregl.NavigationControl());
+      map..addControl(new maplibregl.AttributionControl({
+        compact: true
+      }));
+      map.addControl(new maplibregl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true
+          },
+          trackUserLocation: true
+      }));
 
       fetch("data/utsc.geojson")
 	  .then(function(response) {
