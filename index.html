@@ -22,11 +22,17 @@
     let map = new maplibregl.Map({
       container: 'map',
       style: 'https://api.maptiler.com/maps/dataviz/style.json?key=6hf6e15uU2uBMqnFFRXs',
+      attributionControl: false,
       center: [-79.1859362959516, 43.78467115257381],
       zoom: 16,
       pitch: 45,
       bearing: 0
     });
+
+    map.addControl(new maplibregl.AttributionControl({
+      customAttribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+      compact: true
+      }));
 
     // Add GeoJSON layer
     map.on('load', function() {
